@@ -1,18 +1,16 @@
 #include "HelloWorldScene.h"
 
 
-
 Scene* HelloWorld::createScene()
 {
 	// 'scene' is an autorelease object
 	auto scene = Scene::create();
-
 	// 'layer' is an autorelease object
 	auto layer = HelloWorld::create();
-
+	//auto layer2 = InputValue::create();
 	// add layer as a child to scene
 	scene->addChild(layer);
-
+	//scene->addChild(layer2);
 	// return the scene
 	return scene;
 }
@@ -43,8 +41,14 @@ bool HelloWorld::init()
 	closeItem->setPosition(Vec2(origin.x + visibleSize.width - closeItem->getContentSize().width / 2,
 		origin.y + closeItem->getContentSize().height / 2));
 
+	auto inputValue = MenuItem::create(
+		CC_CALLBACK_1(HelloWorld::menuInputValue, this));
+	
+	//
+	inputValue->setPosition(Vec2(origin.x - visibleSize.width - closeItem->getContentSize().width / 2,
+		origin.y + closeItem->getContentSize().height / 2));
 	// create menu, it's an autorelease object
-	auto menu = Menu::create(closeItem, NULL);
+	auto menu = Menu::create(closeItem,inputValue, NULL);
 	menu->setPosition(Vec2::ZERO);
 	this->addChild(menu, 1);
 
@@ -74,7 +78,7 @@ bool HelloWorld::init()
 	setInit();
 	initSource();
 	initMemory();
-	auto listener = EventListenerKeyboard::create();
+	listener = EventListenerKeyboard::create();
 	listener->onKeyPressed = CC_CALLBACK_2(HelloWorld::onKeyPress, this);
 	listener->onKeyReleased = CC_CALLBACK_2(HelloWorld::onKeyRelease, this);
 	_eventDispatcher->addEventListenerWithSceneGraphPriority(listener, this);
@@ -97,26 +101,32 @@ void HelloWorld::menuCloseCallback(Ref* pSender)
 #endif
 }
 
+void HelloWorld::menuInputValue(Ref* pSender)
+{
+	log("ha");
+}
+
 void HelloWorld::setInit()
 {
-	sourceX = 0;
 	sourceY = 0;
 	memX = 0;
 	memY = 0;
 	smSwitch = false;
 	pushShift = false;
 	pushEnter = false;
+	myInput = NULL;
 }
 void HelloWorld::initSource()
 {
-	sourceMap[0] = new LabelMap("int main() {", "Arial", 24);
+	sourceCount = 1;
+	sourceMap[0] = new LabelMap("int a;", "Arial", 24);
 	sourceMap[1] = new LabelMap("int a;", "Arial", 24);
 	sourceMap[2] = new LabelMap("int b;", "Arial", 24);
 	sourceMap[3] = new LabelMap("a=3;", "Arial", 24);
 	sourceMap[4] = new LabelMap("}", "Arial", 24);
 	float x = this->getChildByName("screen")->getPositionX() - 250;
 	float y = this->getChildByName("screen")->getPositionY() + 200;
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < sourceCount; i++)
 	{
 		sourceMap[i]->setPosition(Vec2(x, y));
 		y -= 55;
@@ -126,7 +136,7 @@ void HelloWorld::initSource()
 
 void HelloWorld::initMemory()
 {
-	float x = this->getChildByName("screen")->getPositionX() + 150;
+	float x = this->getChildByName("screen")->getPositionX() + 50;
 	float y = this->getChildByName("screen")->getPositionY() + 200;
 
 	for (int i = 0; i < 16; i++)
@@ -134,7 +144,7 @@ void HelloWorld::initMemory()
 		for (int j = 0; j < 8; j++)
 		{
 			memMap[i][j] = new LabelMap(".","Arial",20);
-			memMap[i][j]->setPosition(Vec2(x + j * 20, y - i * 20));
+			memMap[i][j]->setPosition(Vec2(x + j * 40, y - i * 20));
 			this->addChild(memMap[i][j], 3);
 		}
 	}
@@ -142,6 +152,26 @@ void HelloWorld::initMemory()
 
 void HelloWorld::onKeyPress(EventKeyboard::KeyCode keyCode, Event *event)
 {
+	if (myInput)
+	{
+		if(!myInput->isEnd())return;
+		else
+		{
+			if (!myInput->label->getString().empty())
+			{
+				memMap[memY][memX]->str.assign(myInput->label->getString());
+				memMap[memY][memX]->setOwnString();
+			}
+			else
+			{
+				memMap[memY][memX]->str.assign(".");
+				memMap[memY][memX]->setString(memMap[memY][memX]->str);
+			}
+			this->getScene()->removeChild(myInput);
+			myInput = NULL;
+			return;
+		}
+	}
 	int px = 0, py = 0;
 	switch (keyCode)
 	{
@@ -166,7 +196,7 @@ void HelloWorld::onKeyPress(EventKeyboard::KeyCode keyCode, Event *event)
 		}
 		else
 		{
-			memMap[memY][memX]->setString(".");
+			memMap[memY][memX]->setOwnString();
 			memMap[memY][memX]->setColor(memMap[memY][memX]->color);
 			setMemoryBlue();
 		}
@@ -185,6 +215,13 @@ void HelloWorld::onKeyPress(EventKeyboard::KeyCode keyCode, Event *event)
 			smSwitch = !smSwitch;
 			pushEnter = true;
 			setMemoryShow();
+		}
+		else
+		{
+			myInput = InputValue::create();
+			myInput->setVisible(true);
+			this->getScene()->addChild(myInput);
+			log("hh");
 		}
 		break;
 	}
@@ -221,13 +258,13 @@ void HelloWorld::moveSource(int px, int py)
 	sourceMap[sourceY]->setColor(Color3B::WHITE);
 	sourceY += py;
 	if (sourceY < 0) sourceY = 0;
-	else if (sourceY > 4) sourceY = 4;
+	else if (sourceY > sourceCount-1) sourceY = sourceCount-1;
 	sourceMap[sourceY]->setColor(Color3B::RED);
 }
 void HelloWorld::moveMemory(int px, int py)
 {
-	memMap[memY][memX]->setString(".");
-	if (pushShift == false) memMap[memY][memX]->setColor(memMap[memY][memX]->color);
+	memMap[memY][memX]->setOwnString();
+	if (pushShift == false) setMemoryColorOrigin();
 
 	memX += px;
 	memY += py;
@@ -304,5 +341,23 @@ void HelloWorld::setMemoryShow()
 				memMap[i][j]->setColor(Color3B::ORANGE);
 			}
 		}
+	}
+}
+void HelloWorld::setMemoryColorOrigin()
+{
+	if (memMap[memY][memX]->color == Color3B::ORANGE)
+	{
+		if (pushEnter&&memMap[memY][memX]->getMaster() == sourceMap[sourceY])
+		{
+			memMap[memY][memX]->setColor(Color3B::ORANGE);
+		}
+		else
+		{
+			memMap[memY][memX]->setColor(Color3B::BLUE);
+		}
+	}
+	else
+	{
+		memMap[memY][memX]->setColor(Color3B::WHITE);
 	}
 }

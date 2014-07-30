@@ -9,9 +9,11 @@ class LabelMap : public cocos2d::LabelTTF
 public:
 	LabelMap(const std::string &str,const std::string &font,float fontSize);
 	void setMaster(LabelMap *master);
+	void setOwnString();
 	LabelMap *getMaster();
 
 	Color3B color;
+	std::string str;
 	LabelMap *master;
 };
 #endif

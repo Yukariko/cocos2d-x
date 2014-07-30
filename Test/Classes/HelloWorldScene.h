@@ -1,9 +1,9 @@
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
-#include "proj.win32\LabelMap.h"
+#include "LabelMap.h"
 #include "cocos2d.h"
-
+#include "InputValueLayer.h"
 USING_NS_CC;
 class HelloWorld : public cocos2d::Layer
 {
@@ -16,6 +16,7 @@ public:
 
 	// a selector callback
 	void menuCloseCallback(cocos2d::Ref* pSender);
+	void menuInputValue(cocos2d::Ref* pSender);
 
 	// custom function
 	void setInit();
@@ -28,15 +29,19 @@ public:
 	void setMemoryFree();
 	void setMemoryBlue();
 	void setMemoryShow();
+	void setMemoryColorOrigin();
+
 	void onKeyPress(EventKeyboard::KeyCode keyCode, Event *event);
 	void onKeyRelease(EventKeyboard::KeyCode keyCode, Event *event);
-
+	
 	// custom value
+	EventListenerKeyboard *listener;
 	bool smSwitch,pushShift,pushEnter;
-	int sourceX, sourceY;
+	int sourceCount, sourceY;
 	int memX, memY;
 	LabelMap *sourceMap[5];
 	LabelMap *memMap[16][8];
+	InputValue *myInput;
 	// implement the "static create()" method manually
 	CREATE_FUNC(HelloWorld);
 };
