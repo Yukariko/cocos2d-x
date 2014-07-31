@@ -197,7 +197,7 @@ void HelloWorld::onKeyPress(EventKeyboard::KeyCode keyCode, Event *event)
 		else
 		{
 			memMap[memY][memX]->setOwnString();
-			memMap[memY][memX]->setColor(memMap[memY][memX]->color);
+			memMap[memY][memX]->setOwnColor();
 			setMemoryBlue();
 		}
 		break;
@@ -247,7 +247,7 @@ void HelloWorld::onKeyRelease(EventKeyboard::KeyCode keyCode, Event *event)
 		}
 		else
 		{
-			setMemoryClear();
+			setMemoryColorOriginAll();
 		}
 		memMap[memY][memX]->setColor(Color3B::RED);
 		break;
@@ -309,9 +309,10 @@ void HelloWorld::setMemoryFree()
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			if (memMap[i][j]->getMaster() == sourceMap[sourceY])
+			if (pushEnter && memMap[i][j]->getMaster() == sourceMap[sourceY])
 			{
 				memMap[i][j]->setColor(Color3B::WHITE);
+				memMap[i][j]->master = NULL;
 				memMap[i][j]->color = Color3B::WHITE;
 			}
 		}
@@ -359,5 +360,26 @@ void HelloWorld::setMemoryColorOrigin()
 	else
 	{
 		memMap[memY][memX]->setColor(Color3B::WHITE);
+	}
+}
+void HelloWorld::setMemoryColorOriginAll()
+{
+	for (int i = 0; i < 16; i++) for (int j = 0; j < 8; j++)
+	{
+		if (memMap[i][j]->color == Color3B::ORANGE)
+		{
+			if (pushEnter&&memMap[i][j]->getMaster() == sourceMap[sourceY])
+			{
+				memMap[i][j]->setColor(Color3B::ORANGE);
+			}
+			else
+			{
+				memMap[i][j]->setColor(Color3B::BLUE);
+			}
+		}
+		else
+		{
+			memMap[i][j]->setColor(Color3B::WHITE);
+		}
 	}
 }

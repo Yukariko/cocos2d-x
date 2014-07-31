@@ -30,6 +30,7 @@ public:
 	void setMemoryBlue();
 	void setMemoryShow();
 	void setMemoryColorOrigin();
+	void setMemoryColorOriginAll();
 
 	void onKeyPress(EventKeyboard::KeyCode keyCode, Event *event);
 	void onKeyRelease(EventKeyboard::KeyCode keyCode, Event *event);

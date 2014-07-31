@@ -21,3 +21,7 @@ void LabelMap::setOwnString()
 {
 	this->setString(str);
 }
+void LabelMap::setOwnColor()
+{
+	this->setColor(color);
+}

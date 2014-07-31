@@ -10,6 +10,8 @@ public:
 	LabelMap(const std::string &str,const std::string &font,float fontSize);
 	void setMaster(LabelMap *master);
 	void setOwnString();
+	void setOwnColor();
+
 	LabelMap *getMaster();
 
 	Color3B color;
