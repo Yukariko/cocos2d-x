@@ -1,10 +1,9 @@
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
-#include "LabelMap.h"
-#include "cocos2d.h"
-#include "InputValueLayer.h"
+#include "ProblemList.h"
 USING_NS_CC;
+
 class HelloWorld : public cocos2d::Layer
 {
 public:
@@ -20,29 +19,17 @@ public:
 
 	// custom function
 	void setInit();
-	void initSource();
-	void initMemory();
-	void moveSource(int px, int py);
-	void moveMemory(int px, int py);
-	void setMemoryAllocate();
-	void setMemoryClear();
-	void setMemoryFree();
-	void setMemoryBlue();
-	void setMemoryShow();
-	void setMemoryColorOrigin();
-	void setMemoryColorOriginAll();
+	void loadProblem(int sel);
 
 	void onKeyPress(EventKeyboard::KeyCode keyCode, Event *event);
 	void onKeyRelease(EventKeyboard::KeyCode keyCode, Event *event);
 	
 	// custom value
 	EventListenerKeyboard *listener;
-	bool smSwitch,pushShift,pushEnter;
-	int sourceCount, sourceY;
-	int memX, memY;
-	LabelMap *sourceMap[5];
-	LabelMap *memMap[16][8];
-	InputValue *myInput;
+	bool pushProblem;
+	int selectProblem;
+	int nProblem;
+	LabelTTF *probLabel[99];
 	// implement the "static create()" method manually
 	CREATE_FUNC(HelloWorld);
 };
